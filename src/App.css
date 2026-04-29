@@ -1,0 +1,58 @@
+/* App.css */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%; /* allow content to grow */
+  overflow-x: hidden;
+  overflow-y: auto; 
+  font-family: "IBM Plex Serif", serif;
+  font-weight: 100;
+  font-style: normal;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+main {
+  flex: 1;
+}
+
+a {
+  text-decoration: none !important;
+}
+
+p {
+  font-family: "", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.footer {
+  width: 100%;
+  z-index: 100;
+  background-color: #212529;
+  color: #fff;
+  padding: 1rem 0;
+}
+
+.btn-link {
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.btn-link:hover {
+  color: #0d6efd !important;
+  transform: scale(1.05);
+}
+
+.container-xxl {
+  overflow: visible !important;
+}
+.flipped-wave {
+  transform: scaleY(-1);
+}
+

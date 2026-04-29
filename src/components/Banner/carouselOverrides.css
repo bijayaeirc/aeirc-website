@@ -1,0 +1,36 @@
+.carousel .control-arrow:before,
+.carousel.carousel-slider .control-arrow:before {
+  margin: 0 40px;
+}
+.carousel .control-dots .dot{
+  width: 12px;
+  height: 12px;
+}
+@media (max-width: 1025px) {
+  .carousel .control-arrow:before,
+  .carousel.carousel-slider .control-arrow:before {
+    margin: 0 12px;
+  }
+}
+
+@media (max-width: 992px) {
+  .carousel .control-arrow:before,
+  .carousel.carousel-slider .control-arrow:before {
+    margin: 0 12px;
+  }
+}
+
+@media (max-width: 576px) {
+  .carousel .control-arrow:before,
+  .carousel.carousel-slider .control-arrow:before {
+    margin: 0 15px;
+  }
+}
+
+@media (max-width: 425px) {
+  .carousel .control-arrow:before,
+  .carousel.carousel-slider .control-arrow:before {
+    margin: 0 7px;
+  }
+}
+

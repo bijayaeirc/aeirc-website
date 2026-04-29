@@ -1,0 +1,56 @@
+/* Main breadcrumb container centered horizontally */
+.breadcrumb-container {
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center;     /* Center vertically */
+  gap: 20px;               /* Space between each breadcrumb item */
+  padding: 20px;
+  background-color: #fff;
+  flex-wrap: nowrap;       /* Keep items in a single line */
+}
+
+.breadcrumb-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  width: 50px;
+  background-color: #0082be;
+  color: #fff;
+  border-radius: 50px;
+  cursor: pointer;
+  overflow: hidden;
+  padding: 0 20px;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+  text-decoration: none; /* Remove underline from Link */
+}
+
+
+/* Text hidden by default */
+.breadcrumb-circle {
+ height: 50px;
+    width: 400px;
+    border: 1px solid #0082be;
+}
+
+
+@media (max-width: 575.98px) {
+  .breadcrumb-container {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .breadcrumb-circle {
+    width: 200px;
+    padding: 0;
+  }
+
+  .breadcrumb-circle .icon {
+    margin: 0;
+  }
+
+  /* .breadcrumb-circle .text {
+    display: none;
+  } */
+}
