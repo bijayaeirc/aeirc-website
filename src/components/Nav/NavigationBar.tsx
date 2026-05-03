@@ -108,12 +108,13 @@ const Navbar = () => {
 
           <div className="collapse navbar-collapse m-0" id="navbarCollapse">
             <div className="navbar-nav ms-auto">
-              {["/", "/about", "/services", "/products", "/newsandnotices", "/contact"].map(
+              {["/", "/about", "/services", "/reservation", "/products", "/newsandnotices", "/contact"].map(
                 (path, idx) => {
                   const label = [
                     "Home",
                     "About",
                     "Services",
+                    "Reservation",
                     "Products",
                     "News & Notices",
                     "Contact",
