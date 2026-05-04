@@ -1,8 +1,14 @@
 /* ── Root layout ─────────────────────────────────────────────────────────────── */
+/*
+  Navbar is position:fixed.
+  Desktop: top-bar (45px) + main navbar (~65px) = 110px total offset.
+  Mobile:  top-bar collapses → only main navbar (~65px) visible (handled in @media below).
+*/
 .rf-root {
   display: flex;
   flex-direction: row;
-  min-height: calc(100vh - 140px);
+  min-height: calc(100vh - 110px);
+  padding-top: 110px;
   font-family: 'DM Sans', system-ui, sans-serif;
   background: linear-gradient(160deg, #0d2118 0%, #1a3a2a 50%, #2a5240 100%);
 }
@@ -402,12 +408,17 @@
   border: 1px solid rgba(255, 255, 255, 0.12);
   padding: 14px 12px 12px;
   backdrop-filter: blur(10px);
+  overflow: hidden;      /* prevents day cells bleeding past rounded corners */
+  box-sizing: border-box;
+  width: 100%;           /* never wider than its container */
+  max-width: 100%;
 }
 
 /* CSS variable overrides */
 .rdp-theme-wrap .rdp-root {
   --rdp-accent-color: #2d6a4f;
   --rdp-accent-background-color: rgba(45, 106, 79, 0.18);
+  --rdp-today-color: #f5c842;   /* tells the library what colour "today" is */
   color: #fff;
   width: 100%;
   max-width: 100%;
@@ -457,6 +468,13 @@
 .rdp-theme-wrap .rdp-dropdown option {
   background: #1a3a2a;
   color: #fff;
+}
+
+/* Nav container — add gap so prev/next buttons don't sit flush against each other */
+.rdp-theme-wrap .rdp-nav {
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 
 /* Nav buttons — only colour, no position override */
@@ -522,7 +540,7 @@
 }
 
 /* Disabled (past dates) */
-.rdp-theme-wrap .rdp-day--disabled .rdp-day_button {
+.rdp-theme-wrap .rdp-disabled .rdp-day_button {
   background: transparent !important;
   color: rgba(255, 255, 255, 0.18) !important;
   cursor: not-allowed !important;
@@ -530,16 +548,16 @@
   box-shadow: none !important;
 }
 
-/* Today */
-.rdp-theme-wrap .rdp-day--today:not(.rdp-day--selected) .rdp-day_button {
-  background: rgba(232, 160, 32, 0.2);
-  color: #f5c842;
-  font-weight: 700;
-  box-shadow: inset 0 0 0 1.5px rgba(232, 160, 32, 0.5);
+/* Today — class is "rdp-today" (no double-dash prefix in v9) */
+.rdp-theme-wrap .rdp-today:not(.rdp-selected):not(.rdp-outside) .rdp-day_button {
+  background: rgba(232, 160, 32, 0.2) !important;
+  color: #f5c842 !important;
+  font-weight: 700 !important;
+  box-shadow: inset 0 0 0 1.5px rgba(232, 160, 32, 0.5) !important;
 }
 
-/* Selected */
-.rdp-theme-wrap .rdp-day--selected .rdp-day_button {
+/* Selected — class is "rdp-selected" (no double-dash prefix in v9) */
+.rdp-theme-wrap .rdp-selected .rdp-day_button {
   background: linear-gradient(135deg, #2d6a4f, #40916c) !important;
   color: #fff !important;
   font-weight: 700;
@@ -568,13 +586,55 @@
 }
 
 /* Outside days — hide completely */
-.rdp-theme-wrap .rdp-day--outside { visibility: hidden; }
+.rdp-theme-wrap .rdp-outside { visibility: hidden; }
 
 /* ── Responsive ──────────────────────────────────────────────────────────────── */
+
+/*
+  Mid-range: 768px – 959px
+  Layout stays side-by-side but the right panel is only ~330-520px wide.
+  At that width the time-picker row (two pickers with AM/PM each) is unreadable,
+  so we narrow the left panel, tighten form padding, and stack all rows to one column.
+*/
+@media (min-width: 768px) and (max-width: 959px) {
+  .rf-left {
+    width: 340px;
+    padding: 32px 20px 28px; /* reduced horizontal padding: 340 - 40 = 300px for calendar */
+  }
+
+  .rf-panel-header {
+    padding: 20px 22px 16px;
+  }
+
+  .rf-form {
+    padding: 20px 22px 32px;
+  }
+
+  /* Stack every form row — fields are too narrow side by side at this range */
+  .rf-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* Constrain the DayPicker grid so cells never bleed past the rounded border */
+  .rdp-theme-wrap {
+    padding: 12px 10px 10px;
+  }
+  .rdp-theme-wrap .rdp-root      { width: 100%; max-width: 100%; }
+  .rdp-theme-wrap .rdp-months    { width: 100%; max-width: 100%; }
+  .rdp-theme-wrap .rdp-month     { width: 100%; max-width: 100%; }
+  .rdp-theme-wrap .rdp-month_grid {
+    table-layout: fixed;
+    border-spacing: 2px;
+  }
+  .rdp-theme-wrap .rdp-day_button { font-size: 12px; }
+}
+
 @media (max-width: 767px) {
   .rf-root {
     flex-direction: column;
     min-height: auto;
+    padding-top: 70px;
   }
 
   .rf-left {
@@ -605,9 +665,20 @@
 
   /* Slightly smaller calendar text */
   .rdp-theme-wrap .rdp-day_button { font-size: 13px; }
+
+  /* Keep the DayPicker grid from overflowing on narrow phones */
+  .rdp-theme-wrap .rdp-root      { width: 100%; max-width: 100%; }
+  .rdp-theme-wrap .rdp-months    { width: 100%; max-width: 100%; }
+  .rdp-theme-wrap .rdp-month     { width: 100%; max-width: 100%; }
+  .rdp-theme-wrap .rdp-month_grid { table-layout: fixed; }
 }
 
 @media (max-width: 380px) {
   .rdp-theme-wrap { padding: 10px 6px 8px; }
   .rf-legend { gap: 10px; }
+
+  /* Even smaller cells — prevents grid overflowing the border on tiny screens */
+  .rdp-theme-wrap .rdp-day_button { font-size: 11px; }
+  .rdp-theme-wrap .rdp-weekday    { font-size: 9px; }
+  .rdp-theme-wrap .rdp-month_grid { border-spacing: 1px; }
 }
