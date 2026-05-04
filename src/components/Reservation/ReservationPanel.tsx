@@ -192,6 +192,7 @@ export default function ReservationPanel({
             value={form.notes}
             onChange={set("notes")}
             placeholder="Special requirements, setup preferences…"
+            maxLength={350}
           />
         </Field>
 
