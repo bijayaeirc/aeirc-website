@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import "./carouselOverrides.css";
 import { Carousel } from "react-responsive-carousel";
+import api from "../../api/client";
 
 interface Slide {
   src: string;
@@ -12,47 +13,45 @@ interface Slide {
   buttonLink?: string;
 }
 
-const slides: Slide[] = [
-  {
-    src: "/img/whatsapp/lab2_img.jpg",
-    alt: "Slide 2",
-    caption: "Our Services",
-    description:
-      "Bridging tech, health, and education through software, hosting, telemedicine, AI, and IT consulting.",
-    buttonText: "View Progress",
-    buttonLink: "/progress",
-  },
-  {
-    src: "/img/Banner/caurosel-2.jpg",
-    alt: "Slide 1",
-    caption: "Our Exam Lab",
-    description:
-      "Certified CBT lab offering secure and standardized testing services with advanced infrastructure.",
-    buttonText: "Explore Lab",
-    buttonLink: "/courses",
-  },
- {
-  src: "/img/whatsapp/Aeirc_lobby.jpg", 
-  alt: "HR Office",
-  caption: "Our Office Space",
-  description:
-    "A glimpse into our modern office where innovation and collaboration meet.",
-  buttonText: "Take a look at our lobby",
-  buttonLink: "/about",
-},
-
-  {
-    src: "/img/whatsapp/lab1_img.jpg",
-    alt: "Slide 4",
-    caption: "Our Operations",
-    description:
-      "Driven by ISO, GDPR, and national standards to ensure secure, high-quality, and reliable services.",
-    buttonText: "Contact Us",
-    buttonLink: "/contact",
-  },
-];
+const BannerSkeleton: React.FC = () => (
+  <div className="banner-skeleton">
+    <div style={{ display: "flex", flexDirection: "column", gap: "1rem", maxWidth: "600px", width: "100%" }}>
+      <div className="banner-skeleton-block" style={{ height: "40px", width: "55%" }} />
+      <div className="banner-skeleton-block" style={{ height: "20px", width: "90%" }} />
+      <div className="banner-skeleton-block" style={{ height: "20px", width: "75%" }} />
+      <div className="banner-skeleton-block" style={{ height: "44px", width: "160px", marginTop: "8px" }} />
+    </div>
+  </div>
+);
 
 const HomeBanner: React.FC = () => {
+  const [slides, setSlides] = useState<Slide[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api
+      .get<Slide[]>("/slider/slides")
+      .then((res) => {
+        if (Array.isArray(res.data) && res.data.length > 0) {
+          setSlides(res.data);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <div id="home-banner" style={{ width: "100vw", height: "80vh", overflow: "hidden" }}>
+        <BannerSkeleton />
+      </div>
+    );
+  }
+
+  if (slides.length === 0) {
+    return null;
+  }
+
   return (
     <div
       id="home-banner"
@@ -92,7 +91,6 @@ const HomeBanner: React.FC = () => {
                 objectFit: "cover",
                 display: "block",
                 margin: "0 auto",
-                // backgroundColor: "#ffffff",
               }}
             />
             <div

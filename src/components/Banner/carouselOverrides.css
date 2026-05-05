@@ -34,3 +34,32 @@
   }
 }
 
+@keyframes banner-shimmer {
+  0%   { background-position: -1000px 0; }
+  100% { background-position:  1000px 0; }
+}
+
+.banner-skeleton {
+  width: 100vw;
+  height: 80vh;
+  background-color: #1c1c1c;
+  display: flex;
+  align-items: center;
+  padding: 0 20px 0 100px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.banner-skeleton-block {
+  background: linear-gradient(90deg, #2a2a2a 25%, #3d3d3d 50%, #2a2a2a 75%);
+  background-size: 1000px 100%;
+  animation: banner-shimmer 1.8s infinite linear;
+  border-radius: 6px;
+}
+
+@media (max-width: 768px) {
+  .banner-skeleton {
+    padding: 0 20px 0 24px;
+  }
+}
+
