@@ -1,6 +1,38 @@
-import { instructors } from "../../data/TeamData";
+import { useEffect, useState } from "react";
+import { instructors as fallbackInstructors } from "../../data/TeamData";
+import api from "../../api/client";
+
+interface TeamMember {
+  name: string;
+  designation: string;
+  description: string;
+  image: string;
+  facebook?: string;
+  twitter?: string;
+  instagram?: string;
+  linkedin?: string;
+}
+
+let cachedTeam: TeamMember[] | null = null;
 
 const TeamSection: React.FC = () => {
+  const [members, setMembers] = useState<TeamMember[]>(
+    cachedTeam ?? fallbackInstructors
+  );
+
+  useEffect(() => {
+    if (cachedTeam) return;
+    api
+      .get<TeamMember[]>("/team/members")
+      .then((res) => {
+        if (Array.isArray(res.data) && res.data.length > 0) {
+          cachedTeam = res.data;
+          setMembers(res.data);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <div className="container-xxl py-5">
       <div className="container">
@@ -11,43 +43,36 @@ const TeamSection: React.FC = () => {
           <h1 className="mb-5">Our Team</h1>
         </div>
         <div className="row g-4">
-          {instructors.map((instructor, index) => (
+          {members.map((member, index) => (
             <div
               className="col-lg-3 col-md-6 wow fadeInUp"
-              data-wow-delay={instructor.delay}
+              data-wow-delay={`${(index % 4) * 0.2 + 0.1}s`}
               key={index}
             >
-              <div className="team-item bg-light ">
-                <div className="overflow-hidden ">
+              <div className="team-item bg-light">
+                <div className="overflow-hidden">
                   <img
                     className="img-fluid img-container team-img-container"
-                    src={instructor.image}
-                    alt={instructor.name}
+                    src={member.image}
+                    alt={member.name}
                   />
                 </div>
                 <div
                   className="position-relative d-flex justify-content-center"
                   style={{ marginTop: "-23px" }}
                 >
-                  {/* <div className="bg-light d-flex justify-content-center pt-2 px-1">
-                    <a className="btn btn-sm-square btn-custom mx-1" href={instructor.facebook}>
-                      <i className="fab fa-facebook-f"></i>
-                    </a>
-                    <a className="btn btn-sm-square btn-custom mx-1" href={instructor.twitter}>
-                      <i className="fab fa-twitter"></i>
-                    </a>
-                    <a className="btn btn-sm-square btn-custom mx-1" href={instructor.instagram}>
-                      <i className="fab fa-instagram"></i>
-                    </a>
-                    <a className="btn btn-sm-square btn-custom mx-1" href={instructor.linkedin}>
-                      <i className="fab fa-linkedin"></i>
-                    </a>
+                  {/* social links placeholder — uncomment when ready
+                  <div className="bg-light d-flex justify-content-center pt-2 px-1">
+                    <a className="btn btn-sm-square btn-custom mx-1" href={member.facebook}><i className="fab fa-facebook-f"></i></a>
+                    <a className="btn btn-sm-square btn-custom mx-1" href={member.twitter}><i className="fab fa-twitter"></i></a>
+                    <a className="btn btn-sm-square btn-custom mx-1" href={member.instagram}><i className="fab fa-instagram"></i></a>
+                    <a className="btn btn-sm-square btn-custom mx-1" href={member.linkedin}><i className="fab fa-linkedin"></i></a>
                   </div> */}
                 </div>
                 <div className="text-center p-4 mt-2">
-                  <h5 className="mb-0">{instructor.name}</h5>
-                  <small>{instructor.designation}</small>
-                  <p>{instructor.description}</p>
+                  <h5 className="mb-0">{member.name}</h5>
+                  <small>{member.designation}</small>
+                  <p>{member.description}</p>
                 </div>
               </div>
             </div>
