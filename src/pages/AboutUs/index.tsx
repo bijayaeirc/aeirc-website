@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import AboutHeader from "../../components/About/AboutHeader";
+import PageBanner from "../../components/Banner/PageBanner";
 import ServiceSection from "../../components/Service/ServiceSection";
 import About from "../../components/About/About";
 import TeamSection from "../../components/Team/TeamSection";
@@ -26,7 +26,7 @@ const AboutUs = () => {
 
   return (
     <div id="about_us-page">
-      <AboutHeader />
+      <PageBanner pageKey="about" title="About Us" breadcrumb="About" />
       <About />
       <ServiceSection />
       <WhyChooseUs />

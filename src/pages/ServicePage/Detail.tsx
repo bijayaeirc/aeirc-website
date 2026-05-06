@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { services } from "../../data/servicesData";
-import ServiceHeader from "../../components/Service/ServiceHeader";
+import PageBanner from "../../components/Banner/PageBanner";
 
 const Details = () => {
   const { id } = useParams();
@@ -36,7 +36,7 @@ const Details = () => {
   return (
     <>
       <div id="detail-page">
-        <ServiceHeader />
+        <PageBanner pageKey="services" title="Our Services" breadcrumb="Services" />
 
         <div className="container-xxl py-5">
           <div className="container">
