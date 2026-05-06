@@ -31,14 +31,19 @@ const PageBanner: React.FC<PageBannerProps> = ({ pageKey, title, breadcrumb }) =
       .catch(() => {});
   }, [pageKey]);
 
+  const overlay = "linear-gradient(rgba(15, 20, 40, 0.82), rgba(15, 20, 40, 0.70))";
+
   const bgStyle = data?.image_url
     ? {
-        background: `linear-gradient(rgba(24, 29, 56, 0.7), rgba(24, 29, 56, 0.274)), url(${data.image_url})`,
+        backgroundImage: `${overlay}, url(${data.image_url})`,
         backgroundPosition: "center" as const,
         backgroundRepeat: "no-repeat" as const,
         backgroundSize: "cover" as const,
       }
-    : undefined;
+    : {
+        backgroundImage: overlay,
+        backgroundColor: "#181d38",
+      };
 
   return (
     <div className="container-fluid py-5 mb-5 page-header" style={bgStyle}>
