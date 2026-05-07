@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { noticeData } from "../../data/NoticeData";
-import NewsHeader from "../../components/NewsAndNotices/NewsAndNoticesHeader";
+import PageBanner from "../../components/Banner/PageBanner";
 
 const upcomingPrograms = [
   {
@@ -40,7 +40,7 @@ const NoticeDetails = () => {
 
   return (
     <div id="notice-detail-page">
-      <NewsHeader />
+      <PageBanner pageKey="news" title="News & Notices" breadcrumb="Notices" />
 
       <div className="container-xxl py-5">
         <div className="container">

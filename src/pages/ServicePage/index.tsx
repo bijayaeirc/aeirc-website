@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import ServiceHeader from "../../components/Service/ServiceHeader";
+import PageBanner from "../../components/Banner/PageBanner";
 import ServiceSection from "../../components/Service/ServiceSection";
 import ServiceDescription from "../../components/Service/ServiceDescription";
 
@@ -21,7 +21,7 @@ const ServicePage = () => {
 
   return (
     <div id="service-page">
-      <ServiceHeader />
+      <PageBanner pageKey="services" title="Our Services" breadcrumb="Services" />
       <ServiceDescription/>
       <div id="service-services">
         <ServiceSection />

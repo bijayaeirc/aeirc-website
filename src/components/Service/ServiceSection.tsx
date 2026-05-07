@@ -1,8 +1,19 @@
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { services } from "../../data/servicesData";
+import { services as fallbackServices } from "../../data/servicesData";
+import type { Service } from "../../data/servicesData";
+import { fetchServices, getServicesCache } from "../../cache/servicesCache";
 
 const ServiceSection = () => {
   const location = useLocation();
+  const [services, setServices] = useState<Service[]>(
+    getServicesCache() ?? fallbackServices
+  );
+
+  useEffect(() => {
+    if (getServicesCache()) return;
+    fetchServices().then(setServices);
+  }, []);
 
   return (
     <div className="container-xxl py-5 service-container">
@@ -29,19 +40,14 @@ const ServiceSection = () => {
                   <div className="flex flex-col flex-grow">
                     <i className={`fa fa-3x ${service.icon} mb-4`}></i>
                     <h5 className="mb-3 service-title">{service.title}</h5>
-                    <p className="text-sm line-clamp-3">
-                      {service.description}
-                    </p>
+                    <p className="text-sm line-clamp-3">{service.description}</p>
                     <div className="mt-4">
                       <Link
                         to={`/ServiceDetails/${service.id}`}
-                        state={{
-                          from: location.pathname,
-                          sectionId: service.id,
-                        }}
+                        state={{ from: location.pathname, sectionId: service.id }}
                         className="btn btn-custom"
                       >
-                        Read More <i className="fa fas-"></i>
+                        Read More
                       </Link>
                     </div>
                   </div>

@@ -1,10 +1,10 @@
-import ContactHeader from '../../components/ContactUs/ContactHeader'
+import PageBanner from "../../components/Banner/PageBanner";
 import ContactSection from '../../components/ContactUs/ContactSection'
 
 const index = () => {
   return (
     <div id="contact_us-page">
-      <ContactHeader/>
+      <PageBanner pageKey="contact" title="Contact" breadcrumb="Contact" />
       <ContactSection/>
     </div>
   )

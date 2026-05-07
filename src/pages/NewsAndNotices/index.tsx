@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import NewsAndNoticesHeader from "../../components/NewsAndNotices/NewsAndNoticesHeader";
+import PageBanner from "../../components/Banner/PageBanner";
 import NewsNoticesBreadcrumb from "../../components/Breadcrumbs/NewsNoticesBreadcrumb";
 
 const NewsNoticePage = () => {
@@ -21,7 +21,7 @@ const NewsNoticePage = () => {
 
   return (
     <div id="news-notices-page">
-      <NewsAndNoticesHeader />
+      <PageBanner pageKey="news" title="News & Notices" breadcrumb="News" />
       <NewsNoticesBreadcrumb />
 
       <div id="content-container">

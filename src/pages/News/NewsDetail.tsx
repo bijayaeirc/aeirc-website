@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { newsData } from "../../data/NewsData";
-import NewsHeader from "../../components/NewsAndNotices/NewsAndNoticesHeader";
+import PageBanner from "../../components/Banner/PageBanner";
 
 const NewsDetails = () => {
   const { id } = useParams();
@@ -12,7 +12,7 @@ const NewsDetails = () => {
 
   return (
     <div>
-      <NewsHeader />
+      <PageBanner pageKey="news" title="News & Notices" breadcrumb="News" />
 
       <div className="container my-5">
         <div className="row">
