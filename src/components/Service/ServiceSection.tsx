@@ -2,27 +2,17 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { services as fallbackServices } from "../../data/servicesData";
 import type { Service } from "../../data/servicesData";
-import api from "../../api/client";
-
-let cachedServices: Service[] | null = null;
+import { fetchServices, getServicesCache } from "../../cache/servicesCache";
 
 const ServiceSection = () => {
   const location = useLocation();
   const [services, setServices] = useState<Service[]>(
-    cachedServices ?? fallbackServices
+    getServicesCache() ?? fallbackServices
   );
 
   useEffect(() => {
-    if (cachedServices) return;
-    api
-      .get<Service[]>("/services")
-      .then((res) => {
-        if (Array.isArray(res.data) && res.data.length > 0) {
-          cachedServices = res.data;
-          setServices(res.data);
-        }
-      })
-      .catch(() => {});
+    if (getServicesCache()) return;
+    fetchServices().then(setServices);
   }, []);
 
   return (

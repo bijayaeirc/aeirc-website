@@ -1,6 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { services } from "../../data/servicesData";
+import { services as fallbackServices } from "../../data/servicesData";
+import type { Service } from "../../data/servicesData";
+import { fetchServices, getServicesCache } from "../../cache/servicesCache";
 import PageBanner from "../../components/Banner/PageBanner";
 
 const Details = () => {
@@ -11,9 +13,23 @@ const Details = () => {
   const fromPath = location.state?.from || "/services";
   const sectionId = location.state?.sectionId || null;
 
-  // const from = location.state?.from || "/services";
+  const findById = (list: Service[]) => list.find((s) => s.id === id);
 
-  const service = services.find((s) => s.id === id);
+  const [service, setService] = useState<Service | undefined>(
+    findById(getServicesCache() ?? fallbackServices)
+  );
+  const [loading, setLoading] = useState(!getServicesCache());
+
+  useEffect(() => {
+    if (getServicesCache()) {
+      setService(findById(getServicesCache()!));
+      return;
+    }
+    fetchServices().then((all) => {
+      setService(findById(all));
+      setLoading(false);
+    });
+  }, [id]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -27,10 +43,16 @@ const Details = () => {
     return () => clearTimeout(timeout);
   }, [id]);
 
-  if (!service) {
+  if (loading) {
     return (
-      <div className="text-danger text-center mt-5">Service not found.</div>
+      <div id="detail-page">
+        <PageBanner pageKey="services" title="Our Services" breadcrumb="Services" />
+      </div>
     );
+  }
+
+  if (!service) {
+    return <div className="text-danger text-center mt-5">Service not found.</div>;
   }
 
   return (
@@ -41,7 +63,6 @@ const Details = () => {
         <div className="container-xxl py-5">
           <div className="container">
             <div className="row g-5">
-              {/* Image Section (left) */}
               <div
                 className="col-lg-6 wow fadeInUp"
                 data-wow-delay="0.1s"
@@ -50,15 +71,18 @@ const Details = () => {
                 <div className="position-relative h-100">
                   <img
                     className="img-fluid position-absolute w-100 h-100"
-                    src={service.image || "/img/default.jpg"} // Make sure to have `image` in your service object
+                    src={service.image || "/img/default.jpg"}
                     alt={service.title}
                     style={{ objectFit: "cover" }}
                   />
                 </div>
               </div>
 
-              {/* Text Content Section (right) */}
-              <div className="col-lg-6 wow fadeInUp" data-wow-delay="0.3s">
+              <div
+                className="col-lg-6 wow fadeInUp"
+                data-wow-delay="0.3s"
+                style={{ overflowWrap: "break-word", minWidth: 0 }}
+              >
                 <h6 className="section-title bg-white text-start text-highlight pe-3">
                   Our Services
                 </h6>
@@ -68,7 +92,6 @@ const Details = () => {
                   {service.detail}
                 </p>
 
-                {/* Optional: List of features */}
                 {service.lists && service.lists.length > 0 && (
                   <div className="row gy-2 gx-4 mb-4">
                     {service.lists.map((item, index) => (
@@ -82,12 +105,9 @@ const Details = () => {
                   </div>
                 )}
 
-                {/* Back or CTA button */}
                 <button
                   className="btn btn-custom py-3 px-5 mt-2"
-                  onClick={() => {
-                    navigate(fromPath, { state: { scrollToId: sectionId } });
-                  }}
+                  onClick={() => navigate(fromPath, { state: { scrollToId: sectionId } })}
                 >
                   Back to Services
                 </button>
