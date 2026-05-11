@@ -24,6 +24,33 @@ const BannerSkeleton: React.FC = () => (
   </div>
 );
 
+const fallbackSlides: Slide[] = [
+  {
+    src: "/img/whatsapp/lab2_img.jpg",
+    alt: "Our Services",
+    caption: "Our Services",
+    description: "Bridging tech, health, and education through software, hosting, telemedicine, AI, and IT consulting.",
+  },
+  {
+    src: "/img/Banner/caurosel-2.jpg",
+    alt: "Our Exam Lab",
+    caption: "Our Exam Lab",
+    description: "Certified CBT lab offering secure and standardized testing services with advanced infrastructure.",
+  },
+  {
+    src: "/img/whatsapp/Aeirc_lobby.jpg",
+    alt: "Our Office Space",
+    caption: "Our Office Space",
+    description: "A glimpse into our modern office where innovation and collaboration meet.",
+  },
+  {
+    src: "/img/whatsapp/lab1_img.jpg",
+    alt: "Our Operations",
+    caption: "Our Operations",
+    description: "Driven by ISO, GDPR, and national standards to ensure secure, high-quality, and reliable services.",
+  },
+];
+
 const HomeBanner: React.FC = () => {
   const [slides, setSlides] = useState<Slide[]>([]);
   const [loading, setLoading] = useState(true);
@@ -34,9 +61,11 @@ const HomeBanner: React.FC = () => {
       .then((res) => {
         if (Array.isArray(res.data) && res.data.length > 0) {
           setSlides(res.data);
+        } else {
+          setSlides(fallbackSlides);
         }
       })
-      .catch(() => {})
+      .catch(() => setSlides(fallbackSlides))
       .finally(() => setLoading(false));
   }, []);
 

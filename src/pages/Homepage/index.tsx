@@ -41,7 +41,7 @@ const Home = () => {
       <PartnersSection />
       <Categories />
       {/* <TestimonialSection /> */}
-      <WeatherCard />
+      {/* <WeatherCard /> */}
       {/* <ScrollToTopButton/> */}
     </div>
   );

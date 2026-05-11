@@ -1,11 +1,30 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import api from "../../api/client";
 
-const FaqSection: React.FC = () => {
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+interface FaqItem {
+  question: string;
+  answer: string;
+}
 
-  const faqItems = [
+interface FaqData {
+  section_heading: string;
+  section_subtitle: string;
+  description: string;
+  media_url: string;
+  media_type: "video" | "image";
+  items: FaqItem[];
+}
+
+const fallbackData: FaqData = {
+  section_heading: "Frequently Asked Questions",
+  section_subtitle: "Ask us anything",
+  description:
+    "Learn more about our examination protocols, standardized services, and commitment to data security.",
+  media_url: "/videos/mushroom.mp4",
+  media_type: "video",
+  items: [
     {
-      question: "How secure are AEIRC’s CBT exam labs?",
+      question: "How secure are AEIRC's CBT exam labs?",
       answer:
         "AEIRC's CBT exam labs are equipped with biometric verification, facial recognition, full HD CCTV surveillance, and soundproof air-conditioned environments, ensuring complete candidate authenticity and exam integrity.",
     },
@@ -29,7 +48,27 @@ const FaqSection: React.FC = () => {
       answer:
         "Absolutely. All data is encrypted and stored securely on GDPR-compliant servers hosted within Nepal. AEIRC follows strict data protection laws and operational protocols to maintain candidate confidentiality.",
     },
-  ];
+  ],
+};
+
+let cachedData: FaqData | null = null;
+
+const FaqSection: React.FC = () => {
+  const [data, setData] = useState<FaqData>(cachedData ?? fallbackData);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (cachedData) return;
+    api
+      .get<FaqData>("/faq/data")
+      .then((res) => {
+        if (res.data?.items?.length > 0) {
+          cachedData = res.data;
+          setData(res.data);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const toggleItem = (index: number) => {
     setActiveIndex(activeIndex === index ? null : index);
@@ -43,42 +82,57 @@ const FaqSection: React.FC = () => {
             <h6 className="section-title text-highlight d-inline-block px-3">
               Q&A
             </h6>
-            <h1 className="mt-2">Frequently Asked Questions</h1>
+            <h1 className="mt-2">{data.section_heading}</h1>
           </div>
 
           <div className="row g-4 align-items-stretch">
-            {/* Left - Video */}
+            {/* Left - Video or Image */}
             <div className="col-md-4">
               <div className="h-100 position-relative overflow-hidden rounded">
-                <video
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  preload="auto"
-                  poster=""
-                  className="w-100 h-100 object-fit-cover rounded faq-img-height"
-                  onMouseEnter={(e) => (e.target as HTMLVideoElement).pause()}
-                  onMouseLeave={(e) => (e.target as HTMLVideoElement).play()}
-                >
-                  <source src="/videos/mushroom.mp4" type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
+                {data.media_type === "video" ? (
+                  /\.(mp4|webm|ogg)/i.test(data.media_url) ? (
+                    <video
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      controls
+                      src={data.media_url}
+                      className="w-100 rounded faq-img-height"
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    >
+                      Your browser does not support the video tag.
+                    </video>
+                  ) : (
+                    <iframe
+                      src={data.media_url}
+                      className="w-100 rounded faq-img-height"
+                      style={{ border: "none", height: "100%" }}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      title="FAQ Video"
+                    />
+                  )
+                ) : (
+                  <img
+                    src={data.media_url}
+                    alt="FAQ"
+                    className="w-100 h-100 object-fit-cover rounded faq-img-height"
+                    style={{ objectFit: "cover" }}
+                  />
+                )}
               </div>
             </div>
 
             {/* Right - Accordion FAQ */}
             <div className="col-md-8">
               <div className="bg-white p-4 h-100 shadow rounded">
-                <h2 className="text-secondary mb-3">Ask us anything</h2>
-                <p className="text-muted mb-4">
-                  Learn more about our examination protocols, standardized
-                  services, and commitment to data security.
-                </p>
+                <h2 className="text-secondary mb-3">{data.section_subtitle}</h2>
+                <p className="text-muted mb-4">{data.description}</p>
 
                 {activeIndex === null ? (
                   <div className="accordion" id="faqAccordion">
-                    {faqItems.map((item, index) => (
+                    {data.items.map((item, index) => (
                       <div
                         key={index}
                         className="accordion-item"
@@ -106,9 +160,9 @@ const FaqSection: React.FC = () => {
                       ← Back to questions
                     </div>
                     <h5 className="mb-2 text-secondary">
-                      {faqItems[activeIndex].question}
+                      {data.items[activeIndex].question}
                     </h5>
-                    <p className="text-muted">{faqItems[activeIndex].answer}</p>
+                    <p className="text-muted">{data.items[activeIndex].answer}</p>
                   </div>
                 )}
               </div>

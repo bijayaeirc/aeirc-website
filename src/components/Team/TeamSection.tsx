@@ -50,11 +50,11 @@ const TeamSection: React.FC = () => {
               key={index}
             >
               <div className="team-item bg-light">
-                <div className="overflow-hidden">
+                <div className="overflow-hidden" style={{ height: "280px" }}>
                   <img
-                    className="img-fluid img-container team-img-container"
                     src={member.image}
                     alt={member.name}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
                   />
                 </div>
                 <div

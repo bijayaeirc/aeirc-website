@@ -1,21 +1,35 @@
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { newsData } from "../../data/NewsData";
+import api from "../../api/client";
+
+interface NewsItem {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  published_date: string;
+  published_by: string;
+}
 
 const LatestNewsSection = () => {
   const location = useLocation();
+  const [items, setItems] = useState<NewsItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Filter latest category
-  const latestNews = newsData
-    .filter((item) => item.category === "latest")
-    // Sort by publishedDate descending (newest first)
-    .sort((a, b) => (a.publishedDate < b.publishedDate ? 1 : -1));
+  useEffect(() => {
+    api
+      .get<NewsItem[]>("/news/latest")
+      .then((res) => {
+        if (Array.isArray(res.data)) setItems(res.data);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
 
-  if (latestNews.length === 0) return null;
+  if (loading || items.length === 0) return null;
 
-  // Most recent item on left
-  const mainItem = latestNews[0];
-  // Next 4 items on right (if any)
-  const sideItems = latestNews.slice(1, 5);
+  const mainItem = items[0];
+  const sideItems = items.slice(1, 5);
 
   return (
     <div className="container py-3" id="latest-news-section">
@@ -25,29 +39,35 @@ const LatestNewsSection = () => {
       </div>
 
       <div className="row g-4">
-        {/* Left: Most recent news */}
+        {/* Left: featured item */}
         <div className="col-lg-7">
-          <div
-            className="position-relative h-100 overflow-hidden rounded shadow"
-            style={{ maxHeight: 545 }}
+          <Link
+            to={`/news/${mainItem.id}`}
+            state={{ from: location.pathname }}
+            style={{ textDecoration: "none" }}
           >
-            <img
-              src={mainItem.image}
-              alt={mainItem.title}
-              className="img-fluid w-100 h-100"
-              style={{ objectFit: "cover" }}
-            />
             <div
-              className="position-absolute bottom-0 start-0 w-100 p-3"
-              style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
+              className="position-relative h-100 overflow-hidden rounded shadow"
+              style={{ maxHeight: 545 }}
             >
-              <h5 className="mb-1 text-white">{mainItem.title}</h5>
-              <small className="text-white">{mainItem.publishedDate}</small>
+              <img
+                src={mainItem.image}
+                alt={mainItem.title}
+                className="img-fluid w-100 h-100"
+                style={{ objectFit: "cover" }}
+              />
+              <div
+                className="position-absolute bottom-0 start-0 w-100 p-3"
+                style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+              >
+                <h5 className="mb-1 text-white">{mainItem.title}</h5>
+                <small className="text-white">{mainItem.published_date}</small>
+              </div>
             </div>
-          </div>
+          </Link>
         </div>
 
-        {/* Right: next 4 latest items */}
+        {/* Right: next 4 items */}
         <div className="col-lg-5 d-flex flex-column gap-3">
           {sideItems.map((item) => (
             <div
@@ -63,9 +83,7 @@ const LatestNewsSection = () => {
               />
               <div className="p-2 flex-grow-1 d-flex flex-column">
                 <h6 className="mb-1">{item.title}</h6>
-                <small className="text-muted d-block mb-1">
-                  {item.publishedDate}
-                </small>
+                <small className="text-muted d-block mb-1">{item.published_date}</small>
                 <p
                   className="mb-2 small"
                   style={{
@@ -73,17 +91,14 @@ const LatestNewsSection = () => {
                     WebkitLineClamp: 1,
                     WebkitBoxOrient: "vertical",
                     overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    width: "100%",
                   }}
-                  title={item.description}
                 >
                   {item.description}
                 </p>
                 <div className="mt-auto">
                   <Link
                     to={`/news/${item.id}`}
-                    state={{ from: location.pathname, news: item }}
+                    state={{ from: location.pathname }}
                     className="btn btn-sm btn-custom"
                   >
                     Read More

@@ -1,12 +1,41 @@
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { newsData } from "../../data/NewsData";
 import PageBanner from "../../components/Banner/PageBanner";
+import api from "../../api/client";
+
+interface NewsItem {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  second_image?: string;
+  published_date: string;
+  published_by: string;
+}
 
 const NewsDetails = () => {
   const { id } = useParams();
-  const newsItem = newsData.find((item) => item.id === id);
+  const [item, setItem] = useState<NewsItem | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  if (!newsItem) {
+  useEffect(() => {
+    setLoading(true);
+    api
+      .get<NewsItem>(`/news/detail/${id}`)
+      .then((res) => { if (res.data?.id) setItem(res.data); })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div>
+        <PageBanner pageKey="news" title="News & Notices" breadcrumb="News" />
+      </div>
+    );
+  }
+
+  if (!item) {
     return <p className="text-center py-5 text-danger">News item not found.</p>;
   }
 
@@ -14,62 +43,30 @@ const NewsDetails = () => {
     <div>
       <PageBanner pageKey="news" title="News & Notices" breadcrumb="News" />
 
-      <div className="container my-5">
+      <div className="container my-5" style={{ overflowX: "hidden" }}>
         <div className="row">
-          {/* Left 60% Section */}
-          <div className="col-md-7">
-            <h2>{newsItem.title}</h2>
-            <p>{newsItem.description}</p>
+          <div className="col-md-7" style={{ overflowWrap: "break-word", minWidth: 0 }}>
+            <h2>{item.title}</h2>
+            <p>{item.description}</p>
             <img
-              src={newsItem.image}
-              alt={newsItem.title}
+              src={item.image}
+              alt={item.title}
               className="img-fluid mb-4 rounded shadow"
             />
           </div>
 
-          {/* Right 40% Section */}
           <div className="col-md-5">
-            {/* Optional Second Image */}
-            {newsItem.secondImage && (
+            {item.second_image && (
               <img
-                src={newsItem.secondImage}
+                src={item.second_image}
                 alt="Additional visual"
                 className="img-fluid mb-3 rounded"
               />
             )}
-
-            {/* Info Section */}
             <div className="bg-custom p-3 rounded shadow-sm mb-3">
-              <p>
-                <strong>Published By:</strong> {newsItem.publishedBy}
-              </p>
-              <p>
-                <strong>Published Date:</strong> {newsItem.publishedDate}
-              </p>
+              <p><strong>Published By:</strong> {item.published_by}</p>
+              <p><strong>Published Date:</strong> {item.published_date}</p>
             </div>
-
-            {/* PDF Downloads */}
-            {/* {newsItem.files.length > 0 && (
-              <div className="bg-custom p-3 rounded shadow-sm">
-                <h5>Download Files</h5>
-                <ul className="list-unstyled">
-                  {newsItem.files.map((file, index) => (
-                    <li key={index} className="mb-2">
-                      <a
-                        href={file}
-                        download
-                        className="btn btn-outline-custom btn-sm"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <i className="fas fa-download me-2"></i> Download PDF{" "}
-                        {index + 1}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )} */}
           </div>
         </div>
       </div>

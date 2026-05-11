@@ -1,154 +1,118 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { noticeData } from "../../data/NoticeData";
 import PageBanner from "../../components/Banner/PageBanner";
+import api from "../../api/client";
 
-const upcomingPrograms = [
-  {
-    title: "AI Workshop 2025",
-    date: "2025-08-15",
-    description: "Explore AI trends and hands-on sessions.",
-  },
-  {
-    title: "Tech Conference 2025",
-    date: "2025-09-10",
-    description: "Annual tech meet for networking and learning.",
-  },
-];
+interface NoticeItem {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  published_date: string;
+  published_by: string;
+}
+
+interface Program {
+  title: string;
+  date: string;
+  description: string;
+}
 
 const NoticeDetails = () => {
   const { id } = useParams();
-  const noticeItem = noticeData.find((n) => n.id === id);
+  const [item, setItem] = useState<NoticeItem | null>(null);
+  const [programs, setPrograms] = useState<Program[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      const detailSection = document.getElementById("notice-detail-page");
-      if (detailSection) {
-        detailSection.scrollIntoView({ behavior: "smooth", block: "start" });
-      } else {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      }
-    }, 100);
-    return () => clearTimeout(timeout);
+    setLoading(true);
+    api
+      .get<NoticeItem>(`/notices/detail/${id}`)
+      .then((res) => { if (res.data?.id) setItem(res.data); })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+
+    api
+      .get<Program[]>("/programs/upcoming")
+      .then((res) => { if (Array.isArray(res.data)) setPrograms(res.data); })
+      .catch(() => {});
   }, [id]);
 
-  if (!noticeItem) {
+  if (loading) {
     return (
-      <div className="text-danger text-center mt-5">Notice not found.</div>
+      <div id="notice-detail-page">
+        <PageBanner pageKey="news" title="News & Notices" breadcrumb="Notices" />
+      </div>
     );
+  }
+
+  if (!item) {
+    return <div className="text-danger text-center mt-5">Notice not found.</div>;
   }
 
   return (
     <div id="notice-detail-page">
       <PageBanner pageKey="news" title="News & Notices" breadcrumb="Notices" />
 
-      <div className="container-xxl py-5">
+      <div className="container-xxl py-5" style={{ overflowX: "hidden" }}>
         <div className="container">
           <div className="row gx-5">
-            {/* Left 60% */}
-            <div className="col-lg-7">
-              <h1 className="mb-4">{noticeItem.title}</h1>
-              <p className="mb-4">{noticeItem.description}</p>
+            <div className="col-lg-7" style={{ overflowWrap: "break-word", minWidth: 0 }}>
+              <h1 className="mb-4">{item.title}</h1>
+              <p className="mb-4">{item.description}</p>
               <img
-                src={noticeItem.image || "/img/default.jpg"}
-                alt={noticeItem.title}
+                src={item.image || "/img/default.jpg"}
+                alt={item.title}
                 className="img-fluid rounded shadow"
-                style={{
-                  maxHeight: "400px",
-                  objectFit: "cover",
-                  width: "100%",
-                }}
+                style={{ maxHeight: "400px", objectFit: "cover", width: "100%" }}
               />
             </div>
 
-            {/* Right 40% */}
             <div className="col-lg-5">
               <div className="bg-custom p-3 rounded mb-4 shadow-sm">
-                <p>
-                  <strong>Published by:</strong> {noticeItem.publishedBy}
-                </p>
-                <p>
-                  <strong>Published on:</strong> {noticeItem.publishedDate}
-                </p>
+                <p><strong>Published by:</strong> {item.published_by}</p>
+                <p><strong>Published on:</strong> {item.published_date}</p>
               </div>
 
-              {/* {noticeItem.files && noticeItem.files.length > 0 && (
-                <div className="mb-5 bg-custom p-3 rounded mb-4 shadow-sm">
-                  <h5>download Files</h5>
-                  <ul className="list-unstyled">
-                    {noticeItem.files.map((file, index) => (
-                      <li key={index} className="mb-2">
-                        <a
-                          href={file}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="btn btn-outline-custom btn-sm"
-                          download
-                        >
-                          📄 Download PDF {index + 1}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )} */}
+              {programs.length > 0 && (
+                <div className="col-12">
+                  <div className="text-center mb-4">
+                    <h3 className="fw-bold">Upcoming Events</h3>
+                  </div>
+                  <div className="list-group">
+                    {programs.map((program, index) => {
+                      const dateObj = new Date(program.date);
+                      const month = dateObj.toLocaleString("default", { month: "short" }).toUpperCase();
+                      const day = dateObj.getDate();
 
-              {/* Upcoming Events / Programs */}
-              <div className="col-12">
-                <div className="text-center mb-4">
-                  
-                  <h3 className="fw-bold">Upcoming Events</h3>
-                </div>
-
-                <div className="list-group">
-                  {upcomingPrograms.map((program, index) => {
-                    const dateObj = new Date(program.date);
-                    const month = dateObj
-                      .toLocaleString("default", { month: "short" })
-                      .toUpperCase();
-                    const day = dateObj.getDate();
-
-                    return (
-                      <div
-                        key={index}
-                        className="list-group-item mb-3 rounded-3 shadow-sm bg-light d-flex align-items-center"
-                      >
-                        {/* Date Square */}
+                      return (
                         <div
-                          className="text-center me-3 mb-2 mb-sm-0 rounded"
-                          style={{
-                            width: "70px",
-                            height: "70px",
-                            backgroundColor: "#0082be",
-                            color: "white",
-                            display: "flex",
-                            flexDirection: "column",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            fontWeight: "bold",
-                            fontSize: "0.9rem",
-                          }}
+                          key={index}
+                          className="list-group-item mb-3 rounded-3 shadow-sm bg-light d-flex align-items-center"
                         >
-                          <div style={{ fontSize: "0.8rem" }}>{month}</div>
-                          <div style={{ fontSize: "1.4rem", lineHeight: "1" }}>
-                            {day}
+                          <div
+                            className="text-center me-3 rounded"
+                            style={{
+                              width: "70px", height: "70px",
+                              backgroundColor: "#0082be", color: "white",
+                              display: "flex", flexDirection: "column",
+                              justifyContent: "center", alignItems: "center",
+                              fontWeight: "bold", flexShrink: 0,
+                            }}
+                          >
+                            <div style={{ fontSize: "0.8rem" }}>{month}</div>
+                            <div style={{ fontSize: "1.4rem", lineHeight: "1" }}>{day}</div>
+                          </div>
+                          <div className="flex-grow-1">
+                            <h6 className="fw-bold text-secondary mb-1">{program.title}</h6>
+                            <p className="mb-0 text-muted">{program.description}</p>
                           </div>
                         </div>
-
-                        {/* Event Info */}
-                        <div className="flex-grow-1">
-                          <h6 className="fw-bold text-secondary mb-1">
-                            {program.title}
-                          </h6>
-                          <p className="mb-0 text-muted">
-                            {program.description}
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
